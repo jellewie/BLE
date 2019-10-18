@@ -114,12 +114,12 @@ void CheckSerialPC() {
       delay(2);
       Temp += char(Serial.read());
     }
-    HandleSerialDataPC(Temp);
+    HandleSerialDataPC(Temp, true);
   }
 }
-void HandleSerialDataPC(String SerialDataFeedback) {
-  //Example : HandleSerialDataPC("AT+VERR?AT+HELP")
-  //CMD send: AT+VERR?  &&  AT+HELP
+void HandleSerialDataPC(String SerialDataFeedback, bool Master) {
+  //Example : HandleSerialDataPC("AT+VERR?AT+HELP", true)
+  //CMD send: AT+VERR?  &&  AT+HELP     (Send to master BLE since 'true')
   //Note    : Will split the string into AT commands, and send it to the BLE
 
   //Trying to make a command splitter, so we could send mote commands at once
@@ -142,8 +142,11 @@ void HandleSerialDataPC(String SerialDataFeedback) {
     CMDAmount++;
   }
   for (int i = 0; i < CMDAmount; i++) {
-    SendToBLE(sa[i]);
-    SerialDebugCommands(sa[i]);
+    if (Master)
+      SendToBLE(sa[i]);
+    else
+      SendToBLESlave(sa[i]);
+
     if (CMDAmount > 1) {
       unsigned long StopAt = millis() + 1000;
       while (millis() < StopAt and SerialData == "") {
@@ -167,6 +170,12 @@ void Delay(int AmountOfMs) {
   }
 }
 void SendToBLE(String Text) {
+#ifdef ShowComData
+  Serial.println("<= '" + Text + "'");
+#endif //ShowComData
+  Serial1.print(Text);
+}
+void SendToBLESlave(String Text) {
 #ifdef ShowComData
   Serial.println("<= '" + Text + "'");
 #endif //ShowComData

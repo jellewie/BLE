@@ -45,8 +45,8 @@ void loop() {                                         //After start up this will
   if (!SlaveProcessed and digitalRead(PDI_ProgSlave)) {  //Check if A slave has been added that needs to be programmed
     SlaveProcessed = true;
     Delay(1000);   //Wait a bit to make sure it's properly connected
-    Serial3.begin(115200);                              //BLE
-    //HandleSerialDataPC("SomeATCommandsToSend");
+    Serial3.begin(115200);                              //BLE slave
+    //HandleSerialDataPC("SomeATCommandsToSend", false);
     Serial3.end();
   } else {
     SlaveProcessed = false;
@@ -131,7 +131,7 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
 
     } else if (Data.substring(0, 3) == "PRO") {//Re-program Master
       Serial.println("(Re)program master (FUNCTION NOT YET IMPLENTED :(");
-      //HandleSerialDataPC("SomeATCommandsToSend");
+      //HandleSerialDataPC("SomeATCommandsToSend", true);
 
     } else if (Data.substring(0, 3) == "TES") {
       Serial.println("Test command (FUNCTION NOT YET IMPLENTED :(");
