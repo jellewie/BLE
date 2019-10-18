@@ -21,7 +21,10 @@ See '/Firmware updater' on how to update the HM-10
 
 #Schematic and Gerber (PCB)
 The schematic and PCB files are made in EasyEda, they also can be found there, although this is the place with the latest documentation, the Gerber might be more up to date there
+-Slave module
 https://easyeda.com/jellewietsma/attiny-bluetooth
+-Master module
+https://easyeda.com/jellewietsma/ble-module-master
 
 #Some more notes:
 Useful Guide http://www.martyncurrey.com/hm-10-bluetooth-4ble-modules/
