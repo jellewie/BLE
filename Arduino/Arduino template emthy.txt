@@ -1,0 +1,26 @@
+/*
+   For the functions; SetPin, ReadPin, Disconnect, ConnectTo, CheckSerialBLE, CheckSerialPC, HandleSerialDataPC, Delay, SendToBLE, etc see 'Functions'
+
+   do NOT use 'delay()' use 'Delay()', the Arduino 'delay()' will freeze the chip, and will mess up serial comminication. the custom 'Delay()' wont
+*/
+
+String SerialData = "";                               //The Last serieal data
+bool CurentlyConnected;                               //If the Arduino 'knows' it it's connected
+unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
+
+void setup() {                                        //This is runned once on bootup
+  Serial.begin(115200);                               //PC
+  Serial1.begin(115200);                              //BLE
+}
+void loop() {                                         //After start up this will be run repearetly
+  CheckSerialPC();                                    //Check and Get PC com data
+  CheckSerialBLE();                                   //Check and Get BLE com data
+  //Your code here
+}
+void PinChanged(byte pin, byte state) {               //This code is called when a BLE module send a pin update state
+  //We only get updates when a pin is high. So when all are low we won't recieve this (Altough next update I do send a low update if posible). (update speed = AT+CYC## in sec)
+  //'pin' is the pin who changed, 'state' is the state it has change to (low = 0, high=1)
+}
+void SerialDebugCommands(String Data) {               //Function to listen to custom Serial commands from the PC
+  //'Data' is the data we got from the PC
+}

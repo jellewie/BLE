@@ -7,17 +7,24 @@ const int MaxAmountOfSlaves = 20;
 String SlaveID[MaxAmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"};      //The MAC id of the slave(s)
 #define ShowComData
 bool Automode = false;
-
-//===============
+unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
 byte AmountOfSlaves;                                  //Amount of slaves
 byte SelectedSlave;                                   //Selecter to wich slave we are talking
+
+bool Pinstates[MaxAmountOfSlaves];
+const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
+
+//===============
 String SerialData = "";                               //The Last serieal data
 bool CurentlyConnected;                               //If the Arduino 'knows' it it's connected
-unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
 
 void setup() {                                        //This is runned once on bootup
-  Serial.begin(115200);                               //PC
-  Serial1.begin(115200);                              //BLE
+  Serial.begin(115200);                               //Start Serial connection PC
+  Serial1.begin(115200);                              //Start Serial connection BLE
+
+  for (int i = 0; i < sizeof(PDI_DipSwitch); i++) {   //For all Dip switches
+    pinMode(PDI_DipSwitch[i], INPUT);                 //Set each as input
+  }
   AmountOfSlaves = CalculateAmountOfSlaves();         //Update AmountOfSlaves counter
   Serial.println("Booted");
   if (Disconnect())                                   //Make sure we aredisconnected
