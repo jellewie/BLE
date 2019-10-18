@@ -12,6 +12,7 @@ byte SelectedSlave;                                   //Selecter to wich slave w
 
 bool Pinstates[MaxAmountOfSlaves];
 const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
+const static byte PDO_LEDS[8] = {3, 3, 3, 3, 3, 3, 3, 3};//Pins where the LEDS are connected to
 
 //===============
 #define ShowComData                                   //Enable this to show all debug data send and recieved from BLE
@@ -22,10 +23,11 @@ void setup() {                                        //This is runned once on b
   Serial.begin(115200);                               //Start Serial connection PC
   Serial1.begin(115200);                              //Start Serial connection BLE
 
-  for (int i = 0; i < sizeof(PDI_DipSwitch); i++) {   //For all Dip switches
+  for (int i = 0; i < sizeof(PDI_DipSwitch); i++)     //For all Dip switches
     pinMode(PDI_DipSwitch[i], INPUT);                 //Set each as input
-  }
-  AmountOfSlaves = CalculateAmountOfSlaves();         //Update AmountOfSlaves counter
+  for (int i = 0; i < sizeof(PDO_LEDS); i++)          //For all LEDs
+    pinMode(PDO_LEDS[i], OUTPUT);                     //Set each as input
+    
   Serial.println("Booted");
   if (Disconnect())                                   //Make sure we aredisconnected
     Serial.println("Succesfull disconnected");
