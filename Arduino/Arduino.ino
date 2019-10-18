@@ -9,6 +9,7 @@ bool Pinstates[MaxAmountOfSlaves];
 const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
 const static byte PDO_LEDS[8] = {3, 3, 3, 3, 3, 3, 3, 3};//Pins where the LEDS are connected to
 
+byte PDI_ProgSlave = 4;                               //Pin with the button to start flashing slave
 
 
 bool Automode = false;
@@ -42,14 +43,14 @@ void loop() {                                         //After start up this will
   }
 
   static bool SlaveProcessed;
-  if (false and !SlaveProcessed) {  //Check if A slave has been added that needs to be programmed
+  if (!SlaveProcessed and digitalRead(PDI_ProgSlave)) {  //Check if A slave has been added that needs to be programmed
     SlaveProcessed = true;
     Delay(1000);   //Wait a bit to make sure it's properly connected
     Serial3.begin(115200);                              //BLE
     //HandleSerialDataPC("SomeATCommandsToSend");
     Serial3.end();
   } else {
-    SlaveProcessed = true;
+    SlaveProcessed = false;
   }
 }
 void DoAnUpdate() {                                   //This is your custom code
