@@ -1,5 +1,8 @@
 bool SetPin(byte pin, byte state) {
-  //AT+PIO21
+  //Example : SetPin(2,1)
+  //CMD send: AT+PIO21
+  //Note    : Only works for input pins 2,3
+
   SendToBLE("AT+PIO" + String(pin) + String(state));
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
   while (millis() < StopAt) {
@@ -19,7 +22,10 @@ bool SetPin(byte pin, byte state) {
   return false;
 }
 String ReadPin(String pin) {
-  //Only works for pins 4,5,6,7,8,9,A,B
+  //Example : ReadPin("B")
+  //CMD send: AT+ADCB?
+  //Note    : Only works for input pins 4,5,6,7,8,9,A,B
+
   SendToBLE("AT+ADC" + pin + "?");
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
   while (millis() < StopAt) {
@@ -32,7 +38,10 @@ String ReadPin(String pin) {
   return "";
 }
 bool Disconnect() {
-  //returns true when it succesful disconnected from something
+  //Example : Disconnect()
+  //CMD send: AT
+  //Note    : returns true when it succesful disconnected from something
+
   SendToBLE("AT");
   CurentlyConnected = false;
   unsigned long StopAt = millis() + 1000;
@@ -47,8 +56,11 @@ bool Disconnect() {
   return false;
 }
 bool ConnectTo(String Mac) {
-  //returns true when it's (alread) connected
-  //Will timeout if already the BLE is already conencted!
+  //Example : ConnectTo(508CB174C9B6)
+  //CMD send: AT+CON508CB174C9B6
+  //Note    : returns true when it's (alread) connected
+  //          Will timeout if already the BLE is already conencted!
+
   CurentlyConnected = false;
   SendToBLE("AT+CON" + Mac);
   unsigned long StopAt = millis() + 11000;
@@ -63,6 +75,9 @@ bool ConnectTo(String Mac) {
   return false;
 }
 void CheckSerialBLE() {
+  //Example : CheckSerialBLE()
+  //Note    : Will change 'SerialData' to the Serial output command from the BLE module if any
+
   SerialData = "";
   if (Serial1.available()) {
     while (Serial1.available()) {
@@ -89,8 +104,10 @@ void CheckSerialBLE() {
       }
   }
 }
-
 void CheckSerialPC() {
+  //Example : CheckSerialPC()
+  //Note    : will read PC command and send it to 'SerialDebugCommands' and to 'HandleSerialDataPC' (to send to the BLE)
+
   if (Serial.available()) {
     String Temp = "";
     while (Serial.available()) {
@@ -101,6 +118,10 @@ void CheckSerialPC() {
   }
 }
 void HandleSerialDataPC(String SerialDataFeedback) {
+  //Example : HandleSerialDataPC("AT+VERR?AT+HELP")
+  //CMD send: AT+VERR?  &&  AT+HELP
+  //Note    : Will split the string into AT commands, and send it to the BLE
+
   //Trying to make a command splitter, so we could send mote commands at once
   int CMDStartAt = 0, CMDAmount = 0;
   String oneLine = SerialDataFeedback, sa[100];
@@ -135,7 +156,10 @@ void HandleSerialDataPC(String SerialDataFeedback) {
   }
 }
 void Delay(int AmountOfMs) {
-  //This will just add a delay to the code, but still keep the Serial connection going.
+  //Example :
+  //CMD send:
+  //Note    : This will just add a delay to the code, but still keep the Serial connection going.
+  //
   unsigned long StopAt = millis() + AmountOfMs;
   while (millis() < StopAt) {
     CheckSerialPC();  //PC

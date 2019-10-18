@@ -1,10 +1,7 @@
 /*
-   pin 4-B are inputs   -> String ReadPin(String pin) {
-   pin 2-3 are outputs  -> bool SetPin(byte pin, byte state)
+   For the functions; SetPin, ReadPin, Disconnect, ConnectTo, CheckSerialBLE, CheckSerialPC, HandleSerialDataPC, Delay, SendToBLE, etc see 'Functions'
 
-   Chip notes:
-   Usefull Guide http://www.martyncurrey.com/hm-10-bluetooth-4ble-modules/
-   PIO1 low (100ms) when high again !Sleepmode
+   do NOT use 'delay()' use 'Delay()', the Arduino 'delay()' will freeze the chip, and will mess up serial comminication. the custom 'Delay()' wont
 */
 const int MaxAmountOfSlaves = 20;
 String SlaveID[MaxAmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"};      //The MAC id of the slave(s)
@@ -18,7 +15,7 @@ String SerialData = "";                               //The Last serieal data
 bool CurentlyConnected;                               //If the Arduino 'knows' it it's connected
 unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
 
-void setup() {                                        //This is runned on bootup once
+void setup() {                                        //This is runned once on bootup
   Serial.begin(115200);                               //PC
   Serial1.begin(115200);                              //BLE
   AmountOfSlaves = CalculateAmountOfSlaves();         //Update AmountOfSlaves counter
@@ -130,7 +127,7 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
     } else if (Data.substring(0, 3) == "PRO") {//Re-program Master
       Serial.println("(Re)program master (FUNCTION NOT YET IMPLENTED :(");
       //HandleSerialDataPC("SomeATCommandsToSend");
-      
+
     } else if (Data.substring(0, 3) == "TES") {
       Serial.println("Test command (FUNCTION NOT YET IMPLENTED :(");
 
