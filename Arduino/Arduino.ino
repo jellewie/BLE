@@ -6,10 +6,9 @@
 const int MaxAmountOfSlaves = 20;
 String SlaveID[MaxAmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"};      //The MAC id of the slave(s)
 bool Pinstates[MaxAmountOfSlaves];
-const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
-const static byte PDO_LEDS[8] = {3, 3, 3, 3, 3, 3, 3, 3};//Pins where the LEDS are connected to
-
 byte PDI_ProgSlave = 4;                               //Pin with the button to start flashing slave
+byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2};     //Pins where the DIP switch is connected to
+byte PDO_LEDS[8] = {3, 3, 3, 3, 3, 3, 3, 3};          //Pins where the LEDS are connected to
 
 
 bool Automode = false;
@@ -28,7 +27,7 @@ void setup() {                                        //This is runned once on b
     pinMode(PDI_DipSwitch[i], INPUT);                 //Set each as input
   for (int i = 0; i < sizeof(PDO_LEDS); i++)          //For all LEDs
     pinMode(PDO_LEDS[i], OUTPUT);                     //Set each as input
-    
+
   Serial.println("Booted");
   if (Disconnect())                                   //Make sure we aredisconnected
     Serial.println("Succesfull disconnected");
@@ -56,7 +55,7 @@ void loop() {                                         //After start up this will
 void DoAnUpdate() {                                   //This is your custom code
   //===============for each slave
   for (int i = 0; i < (sizeof(SlaveID) / sizeof(String); i++) {
-    Serial.println("_" + String(i));
+  Serial.println("_" + String(i));
     //===============Connect
     if (ConnectTo(SlaveID[i])) {
       Serial.println("Succesfull connected to " + String(SlaveID[i]));
