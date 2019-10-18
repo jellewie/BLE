@@ -5,14 +5,14 @@
 */
 const int MaxAmountOfSlaves = 20;
 String SlaveID[MaxAmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"};      //The MAC id of the slave(s)
-bool Automode = false;
-unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
-byte AmountOfSlaves;                                  //Amount of slaves
-byte SelectedSlave;                                   //Selecter to wich slave we are talking
-
 bool Pinstates[MaxAmountOfSlaves];
 const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
 const static byte PDO_LEDS[8] = {3, 3, 3, 3, 3, 3, 3, 3};//Pins where the LEDS are connected to
+
+
+
+bool Automode = false;
+unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
 
 //===============
 #define ShowComData                                   //Enable this to show all debug data send and recieved from BLE
@@ -54,7 +54,7 @@ void loop() {                                         //After start up this will
 }
 void DoAnUpdate() {                                   //This is your custom code
   //===============for each slave
-  for (int i = 0; i < AmountOfSlaves; i++) {
+  for (int i = 0; i < (sizeof(SlaveID) / sizeof(String); i++) {
     Serial.println("_" + String(i));
     //===============Connect
     if (ConnectTo(SlaveID[i])) {
@@ -95,10 +95,11 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
     if (Data.substring(0, 3) == "ADD") {
       if (SerialData.length() >= 15) {
         String MAC = Data.substring(4, 15); //20C38FBE38AC
-        if ((sizeof(SlaveID) / sizeof(String)) == MaxAmountOfSlaves) {
+        byte Counter = sizeof(SlaveID) / sizeof(String); //Amount Of Slaves
+        if (Counter == MaxAmountOfSlaves) {
           Serial.println("Max amount of slaves reached");
         } else {
-          SlaveID[AmountOfSlaves + 1] = MAC;
+          SlaveID[Counter + 1] = MAC;
           Serial.println("Add this mac" + MAC);
         }
       } else {
@@ -116,7 +117,7 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
         Serial.println("Please add 12 digit MAC ID");
       }
     } else if (Data.substring(0, 3) == "LIS") {
-      for (int i = 0; i < AmountOfSlaves; i++) {
+      for (int i = 0; i < sizeof(SlaveID) / sizeof(String); i++) {
         Serial.println("Slave at" + String(i) + " has mac '" + SlaveID[i] + "'");
       }
     } else if (Data.substring(0, 3) == "SPE") {
