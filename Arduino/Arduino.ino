@@ -75,9 +75,6 @@ void PinChanged(byte pin, byte state) {               //This code is called when
   //We only get updates when a pin is high. So when all are low we won't recieve this (Altough next update I do send a low update if posible). (update speed = AT+CYC## in sec)
   Serial.println("PinChanged " + String(pin) + " to " + String(state));
 }
-byte CalculateAmountOfSlaves() {                      //Calculate amount of slaves
-  return (sizeof(SlaveID) / sizeof(String));
-}
 void SerialDebugCommands(String Data) {               //Function to listen to custom Serial commands from the PC
   //This function can be cleared, uncommented (or removed) it's just here to allow me to quickly debug functions
   /*Commands:
@@ -96,11 +93,10 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
     if (Data.substring(0, 3) == "ADD") {
       if (SerialData.length() >= 15) {
         String MAC = Data.substring(4, 15); //20C38FBE38AC
-        if (AmountOfSlaves == MaxAmountOfSlaves) {
+        if ((sizeof(SlaveID) / sizeof(String)) == MaxAmountOfSlaves) {
           Serial.println("Max amount of slaves reached");
         } else {
           SlaveID[AmountOfSlaves + 1] = MAC;
-          AmountOfSlaves = CalculateAmountOfSlaves();
           Serial.println("Add this mac" + MAC);
         }
       } else {
@@ -109,11 +105,10 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
     } else if (Data.substring(0, 3) == "REM") {
       if (SerialData.length() >= 15) {
         String MAC = Data.substring(4, 15); //20C38FBE38AC
-        if (AmountOfSlaves == MaxAmountOfSlaves) {
+        if ((sizeof(SlaveID) / sizeof(String)) == MaxAmountOfSlaves) {
           Serial.println("Max amount of slaves reached");
         } else {
           Serial.println("Remove this mac (FUNCTION NOT YET IMPLENTED :(" + MAC);
-          AmountOfSlaves = CalculateAmountOfSlaves();
         }
       } else {
         Serial.println("Please add 12 digit MAC ID");
