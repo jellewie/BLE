@@ -23,9 +23,9 @@ void setup() {                                        //This is runned once on b
   Serial.begin(115200);                               //Start Serial connection PC
   Serial1.begin(115200);                              //Start Serial connection BLE
 
-  for (int i = 0; i < sizeof(PDI_DipSwitch); i++)     //For all Dip switches
+  for (byte i = 0; i < sizeof(PDI_DipSwitch); i++)     //For all Dip switches
     pinMode(PDI_DipSwitch[i], INPUT);                 //Set each as input
-  for (int i = 0; i < sizeof(PDO_LEDS); i++)          //For all LEDs
+  for (byte i = 0; i < sizeof(PDO_LEDS); i++)          //For all LEDs
     pinMode(PDO_LEDS[i], OUTPUT);                     //Set each as input
 
   Serial.println("Booted");
@@ -54,8 +54,8 @@ void loop() {                                         //After start up this will
 }
 void DoAnUpdate() {                                   //This is your custom code
   //===============for each slave
-  for (int i = 0; i < (sizeof(SlaveID) / sizeof(String); i++) {
-  Serial.println("_" + String(i));
+  for (byte i = 0; i < (sizeof(SlaveID) / sizeof(String)); i++) {
+    Serial.println("_" + String(i));
     //===============Connect
     if (ConnectTo(SlaveID[i])) {
       Serial.println("Succesfull connected to " + String(SlaveID[i]));
@@ -117,7 +117,7 @@ void SerialDebugCommands(String Data) {               //Function to listen to cu
         Serial.println("Please add 12 digit MAC ID");
       }
     } else if (Data.substring(0, 3) == "LIS") {
-      for (int i = 0; i < sizeof(SlaveID) / sizeof(String); i++) {
+      for (byte i = 0; i < sizeof(SlaveID) / sizeof(String); i++) {
         Serial.println("Slave at" + String(i) + " has mac '" + SlaveID[i] + "'");
       }
     } else if (Data.substring(0, 3) == "SPE") {
