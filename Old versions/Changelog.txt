@@ -1,0 +1,6 @@
+# AtTiny BLE V1, 2019-09-18
+init 
+# V2
+-AtTiny 
+-5V gen
+Vcc power in is quite difficult to attach, added optional microB and C usb connector
