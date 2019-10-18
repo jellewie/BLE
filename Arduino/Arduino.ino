@@ -5,7 +5,6 @@
 */
 const int MaxAmountOfSlaves = 20;
 String SlaveID[MaxAmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"};      //The MAC id of the slave(s)
-#define ShowComData
 bool Automode = false;
 unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
 byte AmountOfSlaves;                                  //Amount of slaves
@@ -15,6 +14,7 @@ bool Pinstates[MaxAmountOfSlaves];
 const static byte PDI_DipSwitch[8] = {2, 2, 2, 2, 2, 2, 2, 2}; //Pins where the DIP switch is connected to
 
 //===============
+#define ShowComData                                   //Enable this to show all debug data send and recieved from BLE
 String SerialData = "";                               //The Last serieal data
 bool CurentlyConnected;                               //If the Arduino 'knows' it it's connected
 

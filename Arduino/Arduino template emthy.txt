@@ -7,6 +7,7 @@
 String SerialData = "";                               //The Last serieal data
 bool CurentlyConnected;                               //If the Arduino 'knows' it it's connected
 unsigned long EveryXms = 10000;                       //Time in ms to execute BLE commands
+//#define ShowComData                                 //Enable this to show all debug data send and recieved from BLE
 
 void setup() {                                        //This is runned once on bootup
   Serial.begin(115200);                               //PC
