@@ -89,8 +89,10 @@ void CheckSerialBLE() {
 #ifdef ShowComData
       Serial.println("=> '" + SerialData + "'");
 #endif //ShowComData
-    if (SerialData == "OK+CONN")                    //Connected 'OK+CONN'
+    if (SerialData == "OK+CONN")                    //connected
       CurentlyConnected = true;
+    if (SerialData == "OK+LOST")                    //disconnected
+      CurentlyConnected = false;
     if (SerialData.length() >= 9)                   //PinChange 'OK+Col:01'
       if (SerialData.substring(0, 6) == "OK+Col") {
         static byte LastPinHEX = 0;
