@@ -9,14 +9,16 @@
 */
 const int AmountOfSlaves = 3;
 String SlaveID[AmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"}; //The MAC id of the slave(s)
-const byte ColorHIG[] {0  , 255, 0};                                //RGB color HIGH/ON
-const byte ColorLOW[] {255, 30 , 0};                                //RGB color LOW/off
-const byte ColorDIS[] {255, 0  , 0};                                //RGB color disconnected
-const byte ColorCON[] {0  , 0  , 0};                                //RGB color while connecting
+const byte ColorHIG[] {0  , 255, 0  };                              //RGB color HIGH/ON
+const byte ColorLOW[] {255, 30 , 0  };                              //RGB color LOW/off
+const byte ColorDIS[] {255, 0  , 0  };                              //RGB color disconnected
+const byte ColorCON[] {0  , 0  , 0  };                              //RGB color while connecting
+const byte ColorUNK[] {0  , 0  , 255};                              //RGB color when we where unable to read the pin
+
 //===============
 #define ShowComData                                                 //Enable this to show all debug data send and recieved from BLE
 const int TimeOutMaster = 150;                                      //Time for the master to rest between disconnect and connect to next slave
-                                                                    //120 gives quite some errors, 150ms seems to be like 99%> good
+//120 gives quite some errors, 150ms seems to be like 99%> good
 const byte PDI_UpdateStates = 11;                                   //Pin where the manual update button is located
 const byte PDI_ProgSlave = 10;                                      //Pin with the button to start flashing slave
 const byte PDI_DipSwitch[] = {2, 3, 4, 5, 6, 7, 8, 9};              //Pins where the DIP switch is connected to
@@ -78,7 +80,7 @@ void loop() {                                                       //After star
     if (!DoneSlaveProgrammed) {
       DoneSlaveProgrammed = true;
       Serial2.begin(115200);                                        //Start BLE slave comminication
-      HandleSerialData("AT+RENEWAT+MODE1AT+NAMEBLEslaveAT+PASS191019AT+AD1508CB149790A", false);
+      HandleSerialData("AT+RENEWAT+MODE1AT+PASS191019AT+AD1508CB149790AAT+NAMEBLEslave", false);
       HandleSerialData("AT+ALLO1AT+PWRM0AT+POWE3AT+RESET", false);
       Serial.println("done programming slave");
       Serial2.end();
@@ -95,22 +97,42 @@ void DoAnUpdate() {                                   //This is your custom code
     LEDs[i] = CRGB(ColorCON[0], ColorCON[1], ColorCON[2]);
     FastLED.show();
     if (ConnectTo(SlaveID[i])) {                                    //Connect
-      String TempPinValue = ReadPin("B");
-      if (TempPinValue != "") {
-        float TempValue = TempPinValue.toFloat();
-        Serial.println("Pin B of slave " + String(SlaveID[i]) + " ID " + String(i) + " = " + TempValue);
-        if (TempValue > 3)
-          LEDs[i] = CRGB(ColorHIG[0], ColorHIG[1], ColorHIG[2]);
-        else
-          LEDs[i] = CRGB(ColorLOW[0], ColorLOW[1], ColorLOW[2]);
+      if (SetPin(2, 1)) {
+        String TempPinValue = ReadPin("B");
+        if (TempPinValue != "") {
+          float TempValue = TempPinValue.toFloat();
+          Serial.println("Pin B of slave " + String(SlaveID[i]) + " ID " + String(i) + " = " + TempValue);
+          if (TempValue > 3)
+            LEDs[i] = CRGB(ColorHIG[0], ColorHIG[1], ColorHIG[2]);
+          else
+            LEDs[i] = CRGB(ColorLOW[0], ColorLOW[1], ColorLOW[2]);
+          FastLED.show();
+
+          if (!SetPin(2, 0)) {
+            if (!CurentlyConnected) {
+              i--;  //Reselect the device to try to read the pin again
+              Serial.println("The device disconnected itzelf.. Retrying...");
+            } else {
+              Serial.println("could not set pin low again");
+            }
+          }
+          else
+            Serial.println("Done");
+        } else if (!CurentlyConnected) {
+          i--;  //Reselect the device to try to read the pin again
+          Serial.println("The device disconnected itzelf.. Retrying...");
+        } else {
+          Serial.println("No feedback");
+        }
+
+      } else {
+        Serial.println("could not set pin high");
+        LEDs[i] = CRGB(ColorUNK[0], ColorUNK[1], ColorUNK[2]);
         FastLED.show();
-      } else if (!CurentlyConnected) {
-        i--;  //Reselect the device to try to read the pin again
-        Serial.println("The device disconnected itzelf.. Retrying...");
-      } else
-      {
-        Serial.println("No feedback");
       }
+
+
+
     } else {
       Serial.println("Could not connect to " + SlaveID[i]);
       LEDs[i] = CRGB(ColorDIS[0], ColorDIS[1], ColorDIS[2]);
