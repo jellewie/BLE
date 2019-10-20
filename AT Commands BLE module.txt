@@ -1,32 +1,21 @@
-=======Slave V2
-AT+ADDR?					=MAC_Slave	508CB174C9B6	(3)
-										20C38FBE38AC	(2)
-										D43639716B15	(1)
-AT+RENEW
-AT+MODE1
-AT+NAMEBLEslave
-	AT+ADTY3
-	
-	AT+PIN19091994
-	AT+ALLO1[MAC_Master]	AT+ALLO1508CB174C9B6
-	AT+ALLO1
-AT+PWRM0
-AT+POWE3
-AT+NOTI0
-AT+NOTP0
-AT+RESET
+=======Slave
+AT+RENEWAT+MODE1AT+NAMEBLEslaveAT+PASS191019AT+AD1508CB149790A
+AT+ALLO1AT+PWRM0AT+POWE3AT+RESET
 
-Master V2
-		AT+ADDR?			=MAC_Master	CON508CB174C9B6
-	AT+RENEW
-	AT+IMME1
-	AT+ROLE1
-	AT+NAMEBLEmaster
-		AT+NOTI1
-	AT+POWE3
-	AT+RESET
-		AT+CON[MAC_Slave]
-	
+AT+CYC99
+
+AT+ADDR?	508CB174C9B6
+			20C38FBE38AC
+			D43639716B15
+			
+=======Master
+AT+RENEWAT+IMME1AT+ROLE1AT+NAMEBLEmasterAT+NOTI1AT+POWE3AT+RESET
+
+AT+ADDR?	508CB149790A
+AT+CON[]	AT+CON508CB174C9B6	AT+CON20C38FBE38AC	AT+COND43639716B15
+
+
+
 	
 	
 AT			//Disconnect if connected
@@ -36,9 +25,11 @@ AT+PIO11	//Unconnected = off
 AT+SLEEP
 AT+PIOB?	Read pin 11 (B=11, Its HEX)
 
-
+AT+CYC?		Set PIO collection rate
+AT+POWE?	Set send power 0=23dbm 1=-6dbm 2=0dbm 3=6dbm 
+AT+PWRM?	Auto sleep (0=on)
 AT+RESET 
-AT+NOTP1	Send mac in notifications (CAN NOT BE USED WITH MASTER!
+AT+NOTP1	Send mac in notifications (CAN NOT BE USED WITH MASTER!)
 AT+RENEW	Factory settings
 AT+PASS?	Pin code (6 digit password)
 AT+COL??	Read all pins
@@ -49,7 +40,6 @@ AT+VERR?	Version
 AT+NAME?	Set name (max 12 char)
 AT+ALLO? 				Whitlist - Set 0 off, 1 on)
 AT+AD[para1]?? 			Whitlist - Get mac of ID1
-AT+ALLO[Para1][Para2]	Whitlist - ID MAC
 AT+NOTI?	1=on like “OK” for the AT command and “OK+LOST” when a connection is broken.
 AT+ADVI?	Advertising interval (0-F) F=slower, this affect the responce speed! so timeout connect would need to be longer
 AT+ADTY?	Advertising type 0: Advertising, ScanResponse, Connectable. 1: Only allow last device connectin 1.28 seconds. 2: Only allow Advertising and ScanResponse. 3: Only allow Advertising
@@ -61,17 +51,3 @@ AT+MODE2	(Remote control mode) PIO2 to PIOB as input.
 AT+ROLE?	queries what mode the device is in.
 AT+ROLE0	sets the module to Slave/Peripheral mode.
 AT+ROLE1	sets the module to Master/Central mode.
-	
-	
-Can't get these to work, dont know what they do. (source changelog)
--Added AT+FINDSERVICES? command
--Added AT+FINDALLCHARS? command
--Added AT+NOTIFY_ON command
--Added AT+NTOIFYOFF command
--Added AT+READCHAR command
--Added AT+CHAR command
--Added AT+READDATA command
--Added AT+READDESC command
--Added AT+SEND_DATA command
--Add AT+SET_WAY command
--Add AT+INDICA_ON command

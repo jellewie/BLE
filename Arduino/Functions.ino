@@ -6,7 +6,7 @@ bool SetPin(byte pin, byte state) {
   SendToBLE("AT+PIO" + String(pin) + String(state));
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
   while (millis() < StopAt) {
-    CheckSerialBLE();
+    CheckSerialBLE(true);
     if (SerialData.length() >= 8) {
       if (SerialData.substring(0, 6) == "OK+PIO") {
         if (String(state) == SerialData.substring(8))
@@ -29,7 +29,7 @@ String ReadPin(String pin) {
   SendToBLE("AT+ADC" + pin + "?");
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
   while (millis() < StopAt) {
-    CheckSerialBLE();
+    CheckSerialBLE(true);
     if (SerialData.length() >= 8)
       if (SerialData.substring(0, 6) == "OK+ADC")
         return SerialData.substring(8);
@@ -46,7 +46,7 @@ bool Disconnect() {
   CurentlyConnected = false;
   unsigned long StopAt = millis() + 1000;
   while (millis() < StopAt) {
-    CheckSerialBLE();
+    CheckSerialBLE(true);
     if (SerialData == "OK+LOST")
       return true;
     else if (SerialData == "OK")
@@ -65,7 +65,7 @@ bool ConnectTo(String Mac) {
   SendToBLE("AT+CON" + Mac);
   unsigned long StopAt = millis() + 11000;
   while (millis() < StopAt) {
-    CheckSerialBLE();
+    CheckSerialBLE(true);
     if (SerialData == "OK+CONN")
       return true;
     else if (SerialData == "OK+CONNE" or SerialData == "OK+CONNF")
@@ -74,41 +74,56 @@ bool ConnectTo(String Mac) {
   Serial.println("ConnectTo Timed-Out; can't find '" + Mac + "'");
   return false;
 }
-void CheckSerialBLE() {
+void CheckSerialBLE(bool Master) {
   //Example : CheckSerialBLE()
   //Note    : Will change 'SerialData' to the Serial output command from the BLE module if any
 
   SerialData = "";
-  if (Serial1.available()) {
-    while (Serial1.available()) {
+  bool Serialavailable = false;
+  if (Master)  //If we need to read the master or slave
+    Serialavailable = Serial1.available();
+  else
+    Serialavailable = Serial2.available();
+  if (Serialavailable) {
+    while (Serialavailable) {
       delay(2);
-      SerialData += char(Serial1.read());
+      if (Master) { //If we need to read the master or slave
+        SerialData += char(Serial1.read());
+        Serialavailable = Serial1.available();
+      } else {
+        SerialData += char(Serial2.read());
+        Serialavailable = Serial2.available();
+      }
     }
     SerialData.trim();
-    if (SerialData != "")
+    if (SerialData != "") {
 #ifdef ShowComData
-      Serial.println("=> '" + SerialData + "'");
+      if (Master)
+        Serial.println("=> '" + SerialData + "'");
+      else
+        Serial.println("=> (slave)'" + SerialData + "'");
 #endif //ShowComData
-    if (SerialData == "OK+CONN")                    //connected
-      CurentlyConnected = true;
-    if (SerialData == "OK+LOST")                    //disconnected
-      CurentlyConnected = false;
-    if (SerialData.length() >= 9)                   //PinChange 'OK+Col:01'
-      if (SerialData.substring(0, 6) == "OK+Col") {
-        static byte LastPinHEX = 0;
-        byte PinHEX = SerialData.substring(7, 9).toInt();   //Get current bit status
-        byte ChangedPins = ~(PinHEX ^ (~LastPinHEX));     //Calculate all bits that are updated (Bitwise Xor + inverse)
-        LastPinHEX = PinHEX;                              //Save status so we can calculate updated bits next time
-        for (int i = 0; i <= 8; i++) {                    //For each bit
-          if (bitRead(ChangedPins, i))                    //If this bit is not the same as before
-            PinChanged(11 - i, bitRead(PinHEX, i));
+      if (SerialData == "OK+CONN")                    //connected
+        CurentlyConnected = true;
+      if (SerialData == "OK+LOST")                    //disconnected
+        CurentlyConnected = false;
+      if (SerialData.length() >= 9)                   //PinChange 'OK+Col:01'
+        if (SerialData.substring(0, 6) == "OK+Col") {
+          static byte LastPinHEX = 0;
+          byte PinHEX = SerialData.substring(7, 9).toInt();   //Get current bit status
+          byte ChangedPins = ~(PinHEX ^ (~LastPinHEX));     //Calculate all bits that are updated (Bitwise Xor + inverse)
+          LastPinHEX = PinHEX;                              //Save status so we can calculate updated bits next time
+          for (int i = 0; i <= 8; i++) {                    //For each bit
+            if (bitRead(ChangedPins, i))                    //If this bit is not the same as before
+              PinChanged(11 - i, bitRead(PinHEX, i));
+          }
         }
-      }
+    }
   }
 }
 void CheckSerialPC() {
   //Example : CheckSerialPC()
-  //Note    : will read PC command and send it to 'SerialDebugCommands' and to 'HandleSerialDataPC' (to send to the BLE)
+  //Note    : will read PC command and send it to 'SerialDebugCommands' and to 'HandleSerialData' (to send to the BLE)
 
   if (Serial.available()) {
     String Temp = "";
@@ -116,11 +131,11 @@ void CheckSerialPC() {
       delay(2);
       Temp += char(Serial.read());
     }
-    HandleSerialDataPC(Temp, true);
+    HandleSerialData(Temp, true);
   }
 }
-void HandleSerialDataPC(String SerialDataFeedback, bool Master) {
-  //Example : HandleSerialDataPC("AT+VERR?AT+HELP", true)
+void HandleSerialData(String SerialDataFeedback, bool Master) {
+  //Example : HandleSerialData("AT+VERR?AT+HELP", true)
   //CMD send: AT+VERR?  &&  AT+HELP     (Send to master BLE since 'true')
   //Note    : Will split the string into AT commands, and send it to the BLE
 
@@ -150,10 +165,10 @@ void HandleSerialDataPC(String SerialDataFeedback, bool Master) {
       SendToBLESlave(sa[i]);
 
     if (CMDAmount > 1) {
-      unsigned long StopAt = millis() + 1000;
+      unsigned long StopAt = millis() + 2000;
       while (millis() < StopAt and SerialData == "") {
         CheckSerialPC();  //PC
-        CheckSerialBLE(); //BLE
+        CheckSerialBLE(Master); //BLE
       }
       Delay(10);
       Serial.println("___Next MultiLine CMD___");
@@ -168,7 +183,7 @@ void Delay(int AmountOfMs) {
   unsigned long StopAt = millis() + AmountOfMs;
   while (millis() < StopAt) {
     CheckSerialPC();  //PC
-    CheckSerialBLE(); //BLE
+    CheckSerialBLE(true); //BLE
   }
 }
 void SendToBLE(String Text) {
@@ -179,7 +194,7 @@ void SendToBLE(String Text) {
 }
 void SendToBLESlave(String Text) {
 #ifdef ShowComData
-  Serial.println("<= '" + Text + "'");
+  Serial.println("<= (slave)'" + Text + "'");
 #endif //ShowComData
-  Serial1.print(Text);
+  Serial2.print(Text);
 }
