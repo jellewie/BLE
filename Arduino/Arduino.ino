@@ -14,7 +14,7 @@ const byte ColorLOW[] {255, 30 , 0  };                              //RGB color 
 const byte ColorDIS[] {255, 0  , 0  };                              //RGB color disconnected
 const byte ColorCON[] {0  , 0  , 0  };                              //RGB color while connecting
 const byte ColorUNK[] {0  , 0  , 255};                              //RGB color when we where unable to read the pin
-
+const byte Brightness = 16;                                         //Scale overall brightness down
 //===============
 #define ShowComData                                                 //Enable this to show all debug data send and recieved from BLE
 const int TimeOutMaster = 150;                                      //Time for the master to rest between disconnect and connect to next slave
@@ -48,7 +48,7 @@ void setup() {                                                      //This is ru
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, AmountOfSlaves);     //Set the LED type and such
   fill_solid(&(LEDs[0]), AmountOfSlaves, CRGB(1, 1, 1));            //Set the whole LED strip to be on slightly
   FastLED.show();                                                   //Update
-  FastLED.setBrightness(16);                                        //Scale brightness
+  FastLED.setBrightness(Brightness);                                //Scale brightness
   delay(500);                                                       //Wait a bit to show LEDs are working
   fill_solid(&(LEDs[0]), AmountOfSlaves, CRGB(0, 0, 0));            //Set the whole LED strip to be off (Black)
   FastLED.show();                                                   //Update
