@@ -5,7 +5,7 @@ bool SetPin(byte pin, byte state) {
 
   SendToBLE("AT+PIO" + String(pin) + String(state));
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
-  while (millis() < StopAt) {
+  while (millis() < StopAt and CurentlyConnected) {
     CheckSerialBLE(true);
     if (SerialData.length() >= 8) {
       if (SerialData.substring(0, 6) == "OK+PIO") {
@@ -28,7 +28,7 @@ String ReadPin(String pin) {
 
   SendToBLE("AT+ADC" + pin + "?");
   unsigned long StopAt = millis() + 1000; //(440ms measured as time responce)
-  while (millis() < StopAt) {
+  while (millis() < StopAt and CurentlyConnected) {
     CheckSerialBLE(true);
     if (SerialData.length() >= 8)
       if (SerialData.substring(0, 6) == "OK+ADC")
