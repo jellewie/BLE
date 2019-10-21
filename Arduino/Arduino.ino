@@ -92,84 +92,70 @@ void loop() {                                                       //After star
   if (digitalRead(PDI_UpdateStates) == LOW)
     DoAnUpdate();
 }
-void DoAnUpdate() {                                   //This is your custom code
+void DoAnUpdate() {                                                 //This is your custom code
   for (byte i = 0; i < AmountOfSlaves; i++) {                       //for each slave
-    LEDs[i] = CRGB(ColorCON[0], ColorCON[1], ColorCON[2]);
-    FastLED.show();
+    LEDs[i] = CRGB(ColorCON[0], ColorCON[1], ColorCON[2]);          //Set the connecting color
+    FastLED.show();                                                 //Update the LED's
     if (ConnectTo(SlaveID[i])) {                                    //Connect
-      if (SetPin(2, 1)) {
-        String TempPinValue = ReadPin("B");
-        if (TempPinValue != "") {
-          float TempValue = TempPinValue.toFloat();
+      if (SetPin(2, 1)) {                                           //Set the power to the switch
+        String TempPinValue = ReadPin("B");                         //Read the switch pin
+        if (TempPinValue != "") {                                   //If we have read something
+          float TempValue = TempPinValue.toFloat();                 //Convert it to a float
           Serial.println("Pin B of slave " + String(SlaveID[i]) + " ID " + String(i) + " = " + TempValue);
-          if (TempValue > 3)
-            LEDs[i] = CRGB(ColorHIG[0], ColorHIG[1], ColorHIG[2]);
-          else
-            LEDs[i] = CRGB(ColorLOW[0], ColorLOW[1], ColorLOW[2]);
-          FastLED.show();
-
-          if (!SetPin(2, 0)) {
-            if (!CurentlyConnected) {
-              i--;  //Reselect the device to try to read the pin again
-              Serial.println("The device disconnected itzelf.. Retrying...");
-            } else {
-              Serial.println("could not set pin low again");
-            }
+          if (TempValue > 3) {                                      //if it's above this amount of Volts
+            digitalWrite(PDO_Outputs[i], HIGH);                     //Set the output pin
+            LEDs[i] = CRGB(ColorHIG[0], ColorHIG[1], ColorHIG[2]);  //Show pin high color
+          } else {
+            digitalWrite(PDO_Outputs[i], LOW);                      //Set the output pin
+            LEDs[i] = CRGB(ColorLOW[0], ColorLOW[1], ColorLOW[2]);  //Show pin low color
           }
-          else
-            Serial.println("Done");
-        } else if (!CurentlyConnected) {
-          i--;  //Reselect the device to try to read the pin again
-          Serial.println("The device disconnected itzelf.. Retrying...");
-        } else {
-          Serial.println("No feedback");
+          FastLED.show();                                           //Update the LED's
+          if (!SetPin(2, 0))                                        //remove the power from the switch
+            Serial.println("could not set pin low again");
         }
-
       } else {
-        Serial.println("could not set pin high");
-        LEDs[i] = CRGB(ColorUNK[0], ColorUNK[1], ColorUNK[2]);
-        FastLED.show();
+        LEDs[i] = CRGB(ColorUNK[0], ColorUNK[1], ColorUNK[2]);      //Set the unknown status
+        digitalWrite(PDO_Outputs[i], LOW);                          //Set the output pin
+        FastLED.show();                                             //Update the LED's
       }
-
-
-
+      if (!CurentlyConnected) {                                     //If the device disconnected itzelf
+        Serial.println("The device disconnected itzelf, Retry...");
+        i--;                                                        //Retry this device again
+      }
     } else {
       Serial.println("Could not connect to " + SlaveID[i]);
-      LEDs[i] = CRGB(ColorDIS[0], ColorDIS[1], ColorDIS[2]);
+      LEDs[i] = CRGB(ColorDIS[0], ColorDIS[1], ColorDIS[2]);        //Show disconnected color
       FastLED.show();
     }
-    //===============disconnect
     if (Disconnect())
-      //Serial.println("Succesfull disconnected");
-      Delay(TimeOutMaster);               //Add some delay before sending next command, the master needs to be ready to connect again
-    //===============
+      Delay(TimeOutMaster);                                         //Add some delay before sending next command, the master needs to be ready to connect again
   }
 }
-void PinChanged(byte pin, byte state) {               //This code is called when a BLE module send a pin update state
+void PinChanged(byte pin, byte state) {                             //This code is called when a BLE module send a pin update state
   //We only get updates when a pin is high. So when all are low we won't recieve this (Altough next update I do send a low update if posible). (update speed = AT+CYC## in sec)
   Serial.println("PinChanged " + String(pin) + " to " + String(state));
 }
-void SerialDebugCommands(String Data) {               //Function to listen to custom Serial commands from the PC
+void SerialDebugCommands(String Data) {                             //Function to listen to custom Serial commands from the PC
 
 }
 void SetEveryXms() {
   //The time set with the DipSwitches (min 1 sec, max 12 Hours)
   int TempDelay = 1;
   if (digitalRead(PDI_DipSwitch[0]) == LOW)
-    TempDelay *= 10;
+    TempDelay += TempDelay * 10;
   if (digitalRead(PDI_DipSwitch[1]) == LOW)
-    TempDelay *= 60;
+    TempDelay += TempDelay * 30;
   if (digitalRead(PDI_DipSwitch[2]) == LOW)
-    TempDelay *= 600;
+    TempDelay += TempDelay * 60;
   if (digitalRead(PDI_DipSwitch[3]) == LOW)
-    TempDelay *= 1350;
+    TempDelay += TempDelay * 120;
   if (digitalRead(PDI_DipSwitch[4]) == LOW)
-    TempDelay *= 2700;
+    TempDelay += TempDelay * 240;
   if (digitalRead(PDI_DipSwitch[5]) == LOW)
-    TempDelay *= 5400;
+    TempDelay += TempDelay * 480;
   if (digitalRead(PDI_DipSwitch[6]) == LOW)
-    TempDelay *= 10800;
+    TempDelay += TempDelay * 960;
   if (digitalRead(PDI_DipSwitch[7]) == LOW)
-    TempDelay *= 21600;
+    TempDelay += TempDelay * 1920;
   EveryXms = TempDelay * 1000;                 //Set and convert from s to ms
 }
