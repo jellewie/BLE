@@ -95,7 +95,9 @@ void CheckSerialBLE(bool Master) {
         Serialavailable = Serial2.available();
       }
     }
-    SerialData.trim();
+    SerialData.trim();                          //Remove spaces
+    SerialData.replace(String(char(10)), "");   //Remove /n
+    SerialData.replace(String(char(13)), "");   //Remove /r
     if (SerialData != "") {
 #ifdef ShowComData
       if (Master)
