@@ -7,8 +7,7 @@
       ADD THE SLAVE AT COMMANDS
 
 */
-const int AmountOfSlaves = 3;
-String SlaveID[AmountOfSlaves] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"}; //The MAC id of the slave(s)
+String SlaveID[] = {"508CB174C9B6", "20C38FBE38AC", "D43639716B15"}; //The MAC id of the slave(s)
 const byte ColorHIG[] {0  , 255, 0  };                              //RGB color HIGH/ON
 const byte ColorLOW[] {255, 30 , 0  };                              //RGB color LOW/off
 const byte ColorDIS[] {255, 0  , 0  };                              //RGB color disconnected
@@ -16,6 +15,7 @@ const byte ColorCON[] {0  , 0  , 0  };                              //RGB color 
 const byte ColorUNK[] {0  , 0  , 255};                              //RGB color when we where unable to read the pin
 const byte Brightness = 16;                                         //Scale overall brightness down
 //===============
+const int AmountOfSlaves = sizeof(SlaveID) / sizeof(String);
 #define ShowComData                                                 //Enable this to show all debug data send and recieved from BLE
 const int TimeOutMaster = 150;                                      //Time for the master to rest between disconnect and connect to next slave
 //120 gives quite some errors, 150ms seems to be like 99%> good
