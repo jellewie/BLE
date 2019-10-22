@@ -61,12 +61,12 @@ void loop() {                                                       //After star
   CheckSerialPC();                                                  //Check and Get PC com data
   CheckSerialBLE(true);                                                 //Check and Get BLE com data
 
-  //  static unsigned long LastTime;                                    //Create a value that stores the last updated time (only once, will keep it's data after the loop since it's static)
-  //  if (millis() > LastTime + EveryXms) {                             //If it's time to update
-  //    LastTime = millis();                                            //Set new LastTime updated (This will prospone the update for 'EveryXms' amount of time)
-  //    DoAnUpdate();                                                   //Send and recieve commands of all slaves
-  //    SetEveryXms();
-  //  }
+  static unsigned long LastTime;                                    //Create a value that stores the last updated time (only once, will keep it's data after the loop since it's static)
+  if (millis() > LastTime + EveryXms) {                             //If it's time to update
+    LastTime = millis();                                            //Set new LastTime updated (This will prospone the update for 'EveryXms' amount of time)
+    DoAnUpdate();                                                   //Send and recieve commands of all slaves
+    SetEveryXms();
+  }
 
 #define EveryXmsBlink 500
   static unsigned long LastTimeBlink;                               //Create a value that stores the last updated time
