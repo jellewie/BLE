@@ -49,8 +49,6 @@ bool Disconnect() {
     CheckSerialBLE(true);
     if (SerialData == "OK+LOST")
       return true;
-    else if (SerialData == "OK")
-      return false;
   }
   Serial.println("Disconnect Timed-Out");
   return false;
@@ -107,9 +105,9 @@ void CheckSerialBLE(bool Master) {
 #endif //ShowComData
       if (SerialData == "OK+CONN")                    //connected
         CurentlyConnected = true;
-      if (SerialData == "OK+LOST")                    //disconnected
+      else if (SerialData == "OK+LOST")                    //disconnected
         CurentlyConnected = false;
-      if (SerialData.length() >= 9)                   //PinChange 'OK+Col:01'
+      else if (SerialData.length() >= 9)                   //PinChange 'OK+Col:01'
         if (SerialData.substring(0, 6) == "OK+Col") {
           static byte LastPinHEX = 0;
           byte PinHEX = SerialData.substring(7, 9).toInt();   //Get current bit status
