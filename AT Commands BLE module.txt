@@ -26,7 +26,10 @@ AT+PIO10	//Unconnected = blink
 AT+PIO11	//Unconnected = off
 
 AT+SLEEP
-AT+PIOB?	Read pin 11 (B=11, Its HEX)
+
+AT+COL??	Read all pins
+AT+ADCB?	Read pin
+AT+PIOB?	Set or Read pin (HEX)
 
 AT+CYC?		Set PIO collection rate
 AT+POWE?	Set send power 0=23dbm 1=-6dbm 2=0dbm 3=6dbm 
@@ -35,10 +38,9 @@ AT+RESET
 AT+NOTP1	Send mac in notifications (CAN NOT BE USED WITH MASTER!)
 AT+RENEW	Factory settings
 AT+PASS?	Pin code (6 digit password)
-AT+COL??	Read all pins
+
 AT+BAUD?	Set baudrate 0=9600 4=115200
 AT+IMME?	auto /manual connect (0 auto, 1 manual) (with manual; AT+START, AT+CONN, AT+CONL)
-AT+ADCB?	read pin B
 AT+VERR?	Version
 AT+NAME?	Set name (max 12 char)
 AT+ALLO? 				Whitlist - Set 0 off, 1 on)
