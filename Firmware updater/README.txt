@@ -16,6 +16,9 @@ https://forum.arduino.cc/index.php?topic=393655.0
 4) Write and execute this command: (end at 500) (This is V540)
 	CCLoader.exe <COM Port> <Firmware.bin> 0
 	CCLoader_x86_64.exe 5 CC2541hm10v540.bin 0
+	
+-YOU NOW NEED A USB<->RS232 COM CABLE/CONNECTOR
+
 5) connect TX and RX to pc, so we can acces the BLE chip by COM
 6) send 'AT+SBLUP', continue when 'OK+SBLUP' (make sure pin11 (RESET) is disconnected)
 7) open HMSoft.exe and upload 'HMSoft.bin' to the com (This is V705)
